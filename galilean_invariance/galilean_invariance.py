@@ -106,11 +106,11 @@ if __name__ == '__main__':
     #----Loop to iterate over simulations and plot them-----
     for hmlbmFile, standardFile in zip(hmlbmFiles, standardFiles):
         #-------Plot velocity profile for standard model (Using LATBOLTZ package of lammps)-----
-        plot_sim(os.path.join(cwd,os.path.join("standardLB",standardFile)),x="z", y="vy", headers=["z", "rho", "vx", "vy", "vz"], scaled = False,
+        plot_sim(os.path.join(cwd,os.path.join("data",standardFile)),x="z", y="vy", headers=["z", "rho", "vx", "vy", "vz"], scaled = False,
                  line_style=style_dict["standardlb"]["line"], color=style_dict["standardlb"]["color"], legend=style_dict["standardlb"]["label"], ax=myax)
     
         #------Plot HMLBM velocity profile-----
-        data = plot_sim(os.path.join(cwd,os.path.join("HMLBM",hmlbmFile)), x = "z", y= "vy", headers=["z", "rho", "temp", "vx", "vy", "vz"], scaled = False,
+        data = plot_sim(os.path.join(cwd,os.path.join("data",hmlbmFile)), x = "z", y= "vy", headers=["z", "rho", "temp", "vx", "vy", "vz"], scaled = False,
                  line_style = style_dict["hmlbm"]["line"], color = style_dict["hmlbm"]["color"], legend = style_dict["hmlbm"]["label"], ax = myax)
     
         #------Plot analytical solutions-------
