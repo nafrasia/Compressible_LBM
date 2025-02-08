@@ -1,12 +1,18 @@
-#====================================================================
-# This code plots HMLBM, standard, and analytical solutions of
-# the Couette flow under gravitational field
-# 
-# Author: Navid Afrasiabian <nafrasia@uwo.ca>
-#
-# License: MIT 2025
-#====================================================================
+"""
+====================================================================
+This code plots HMLBM, standard, and analytical solutions of
+the Couette flow under gravitational field
+Author: Navid Afrasiabian <nafrasia@uwo.ca>
 
+License: MIT 2025
+====================================================================
+
+Parameters
+----------
+savefig: str
+    If savefig is passed, the figures are saved to hard drive
+
+"""
 #-----------------------------------------------
 # Importing necessary packages
 #-----------------------------------------------
@@ -17,8 +23,6 @@ import pandas as pd
 import scipy.optimize as sc
 import sys
 
-# Get the current directory
-cwd= os.getcwd()
 
 #------------------------------------------------
 # Define functions
@@ -89,6 +93,14 @@ if __name__ == '__main__':
     else:
         if sys.argv[1] == 'savefig':
             savefig = 1
+    
+    #--------Define directory variables------
+    cwd = os.getcwd()
+    read_dir = os.path.join(cwd, 'data')
+    write_dir = os.path.join(cwd, 'output')
+    if not os.path.exists(write_dir):
+        os.makedirs(write_dir)
+    
     # hmlbm stands for Higher Moment Lattice Boltzmann Method
     hmlbmFiles=["Couette_HMLBM_U0.5.csv","Couette_HMLBM_U1.csv"]
     standardFiles=["Couette_standard_U0.5.csv", "Couette_standard_U1.csv"]
@@ -106,11 +118,11 @@ if __name__ == '__main__':
     #----Loop to iterate over simulations and plot them-----
     for hmlbmFile, standardFile in zip(hmlbmFiles, standardFiles):
         #-------Plot velocity profile for standard model (Using LATBOLTZ package of lammps)-----
-        plot_sim(os.path.join(cwd,os.path.join("data",standardFile)),x="z", y="vy", headers=["z", "rho", "vx", "vy", "vz"], scaled = False,
+        plot_sim(os.path.join(read_dir,standardFile),x="z", y="vy", headers=["z", "rho", "vx", "vy", "vz"], scaled = False,
                  line_style=style_dict["standardlb"]["line"], color=style_dict["standardlb"]["color"], legend=style_dict["standardlb"]["label"], ax=myax)
     
         #------Plot HMLBM velocity profile-----
-        data = plot_sim(os.path.join(cwd,os.path.join("data",hmlbmFile)), x = "z", y= "vy", headers=["z", "rho", "temp", "vx", "vy", "vz"], scaled = False,
+        data = plot_sim(os.path.join(read_dir, hmlbmFile), x = "z", y= "vy", headers=["z", "rho", "temp", "vx", "vy", "vz"], scaled = False,
                  line_style = style_dict["hmlbm"]["line"], color = style_dict["hmlbm"]["color"], legend = style_dict["hmlbm"]["label"], ax = myax)
     
         #------Plot analytical solutions-------
@@ -128,6 +140,6 @@ if __name__ == '__main__':
         myax.set_xlabel(r"$z(cm)$")
     
     if savefig:
-        plt.savefig(os.path.join(cwd, "Galilean_Invariance.png"), dpi=300, bbox_inches="tight")
+        plt.savefig(os.path.join(write_dir, "Galilean_Invariance.png"), dpi=300, bbox_inches="tight")
     else:
         plt.show()
