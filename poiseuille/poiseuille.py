@@ -1,11 +1,20 @@
-#====================================================================
-# Plots velocity profile and computes viscosity for an incompressible
-# Poiseuille flow
-#
-# Author: Navid Afrasiabian <nafrasia@uwo.ca>
-#
-# License: MIT, 2025
-#====================================================================
+"""
+====================================================================
+ Plots velocity profile and computes viscosity for an incompressible
+ Poiseuille flow
+
+ Author: Navid Afrasiabian <nafrasia@uwo.ca>
+
+ License: MIT, 2025
+====================================================================
+
+Parameters
+-----------
+savefig: str
+    If savefig is provided on command line, 
+    figures are saved to hard drive
+
+"""
 #--------------------------------------------------------------------
 # Load necessary packages
 #--------------------------------------------------------------------
@@ -16,14 +25,32 @@ import scipy.optimize as sc
 import os
 import sys
 
-# Command-line flag for saving figures
+#======================
+# Function definition
+#======================
+
+def parabola(x,a,b,c):
+    ''' Returns values of parabola'''
+    return a*x**2+b*x+c;
+
+def analytic_profile(z, a, rho, visc, H):
+    ''' Returns the analytic velocity profile of a Poiseuille flow''' 
+    return -(1/2/visc)*rho*a*z*(z-H)
+
+#-----Command-line flag for saving figures-----
 saveflag = 0
 
 for flag in sys.argv:
     if flag == "savefig":
         saveflag = 1
 
-cwd = os.getcwd()
+#--------Define directory variables------
+    cwd = os.getcwd()
+    read_dir = os.path.join(cwd, 'data')
+    write_dir = os.path.join(cwd, 'output')
+    if not os.path.exists(write_dir):
+        os.makedirs(write_dir)
+
 # Lists of data files
 tau1_files = ["Poiseuilleg1e-05T0.1tau1eq.csv","Poiseuilleg1e-05T0.2tau1eq.csv","Poiseuilleg1e-05T0.3tau1eq.csv","Poiseuilleg1e-05T0.4tau1eq.csv"]
 tau2_files = ["Poiseuilleg1e-05T0.1tau2eq.csv","Poiseuilleg1e-05T0.2tau2eq.csv","Poiseuilleg1e-05T0.3tau2eq.csv","Poiseuilleg1e-05T0.4tau2eq.csv"]
@@ -41,14 +68,6 @@ dx=2            # Spatial resolution/ Grid spacing
 colour = ['tab:blue','tab:orange','tab:green','tab:red','tab:purple','tab:brown','tab:pink','tab:gray','tab:olive','tab:cyan']
 markers = ['o', 'D', 's', '*', 'p','P','d','>','<', '^']
 
-def parabola(x,a,b,c):
-    ''' Returns values of parabola'''
-    return a*x**2+b*x+c;
-
-def analytic_profile(z, a, rho, visc, H):
-    ''' Returns the analytic velocity profile of a Poiseuille flow''' 
-    return -(1/2/visc)*rho*a*z*(z-H)
-
 
 for filenames in filenamelist:
     Tlist = np.array([])
@@ -56,7 +75,7 @@ for filenames in filenamelist:
     i=0
     for file in filenames:
         # Read data
-        bcdf = pd.read_csv(os.path.join(cwd,os.path.join('data',file)), header=0, names=["z","rho","temp","vx", "vy", "vz"])
+        bcdf = pd.read_csv(os.path.join(read_dir,file), header=0, names=["z","rho","temp","vx", "vy", "vz"])
 
         # Fit the data to a parabola to find the velocity profile
         init_guess=[1,0,0]
@@ -96,7 +115,7 @@ for filenames in filenamelist:
     plt.xticks(fontsize=13)
     plt.yticks(fontsize=13)
     if saveflag:
-        plt.savefig(f"{cwd}/u_poiseuille_tau{taulist[taucounter]}eq.png", bbox_inches="tight", dpi=300)
+        plt.savefig(os.path.join(write_dir, f"u_poiseuille_tau{taulist[taucounter]}.png"), bbox_inches="tight", dpi=300)
     
     taucounter += 1
 
@@ -115,6 +134,6 @@ for filenames in filenamelist:
     plt.xticks(fontsize=13)
     plt.yticks(fontsize=13)
     if saveflag:
-        plt.savefig(f"{cwd}/viscosity_poiseuille_eq.png", bbox_inches="tight", dpi=300)
+        plt.savefig(os.path.join(write_dir, f"viscosity_poiseuille.png"), bbox_inches="tight", dpi=300)
 if not saveflag:
     plt.show()
